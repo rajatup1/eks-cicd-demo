@@ -6,6 +6,8 @@ pipeline {
     ECR_REPO_URL = "200227355496.dkr.ecr.ap-south-1.amazonaws.com/flask-eks-demo"
     IMAGE_TAG = "${BUILD_NUMBER}"
     DOCKER = "/usr/local/bin/docker"
+    DOCKER_CONFIG = "/Users/rajatupadhyay/.jenkins/.docker
+    
   }
 
   stages {
