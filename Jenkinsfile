@@ -6,6 +6,7 @@ pipeline {
     ECR_REPO_URL = "200227355496.dkr.ecr.ap-south-1.amazonaws.com/flask-eks-demo"
     IMAGE_TAG = "${BUILD_NUMBER}"
     DOCKER = "/usr/local/bin/docker"
+    AWS = "/opt/homebrew/bin/aws"
     DOCKER_CONFIG = "/Users/rajatupadhyay/.jenkins/.docker"
    }
 
@@ -28,12 +29,11 @@ pipeline {
     stage('Login to ECR') {
       steps {
         sh '''
-          aws ecr get-login-password --region $AWS_REGION \
+           $AWS ecr get-login-password --region $AWS_REGION \
           | $DOCKER login --username AWS --password-stdin $ECR_REPO_URL
         '''
       }
     }
-
     stage('Push Image') {
       steps {
         sh '''
