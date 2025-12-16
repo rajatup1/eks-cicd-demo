@@ -7,6 +7,7 @@ pipeline{
 
     }
     stages{
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -21,10 +22,7 @@ pipeline{
                         --load .
                     '''
             }
-            
-
         }
-    }
         stage("Login and push to ecr"){
             steps{
                 sh '''
@@ -33,6 +31,7 @@ pipeline{
                     docker push $ECS_REPO_URL:$IMAGE_TAG
                 '''
             }
+        }
 
         stage("Deploy to EKS"){
             steps{
@@ -43,7 +42,5 @@ pipeline{
                 '''
             }
         }
-
-
-        }
+   }
 }
