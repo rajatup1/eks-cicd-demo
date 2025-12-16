@@ -45,7 +45,7 @@ pipeline {
     stage('Update kubeconfig') {
       steps {
         sh '''
-         $AWS eks update-kubeconfig --region $AWS_REGION --name eks-cicd-demo
+         $AWS eks update-kubeconfig --region $AWS_REGION --name eks-cicd-demo --kubeconfig /Users/rajatupadhyay/.jenkins/kubeconfig
        '''
    }
  }
@@ -54,7 +54,7 @@ pipeline {
     stage('Deploy to EKS') {
       steps {
         sh '''
-            $KUBECTL set image deployment/flask-app \
+            $KUBECTL --kubeconfig /Users/rajatupadhyay/.jenkins/kubeconfig set image deployment/flask-app \
             flask=$ECR_REPO_URL:$IMAGE_TAG
         '''
       }
