@@ -22,7 +22,7 @@ pipeline{
            }
             steps{
                     sh '''
-                        docker buildx build \
+                        /usr/local/bin/docker buildx build \
                         --platform linux/amd64 \
                         -t $ECR_REPO_URL:$IMAGE_TAG \
                         --load .
@@ -39,8 +39,8 @@ pipeline{
             steps{
                 sh '''
                     aws ecr get-login-password --region $AWS_REGION | \
-                    docker login --username AWS --password-stdin $ECS_REPO_URL
-                    docker push $ECS_REPO_URL:$IMAGE_TAG
+                    /usr/local/bin/docker login --username AWS --password-stdin $ECS_REPO_URL
+                    /usr/local/bin/docker push $ECS_REPO_URL:$IMAGE_TAG
                 '''
             }
         }
