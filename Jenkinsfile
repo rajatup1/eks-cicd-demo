@@ -20,10 +20,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         sh '''
-          $DOCKER buildx build \
-            --platform linux/amd64 \
-            -t $ECR_REPO_URL:$IMAGE_TAG \
-            --load .
+          $DOCKER build -t $ECR_REPO_URL:$IMAGE_TAG .
         '''
       }
     }
