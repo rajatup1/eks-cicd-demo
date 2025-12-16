@@ -42,6 +42,14 @@ pipeline {
         '''
       }
     }
+    stage('Update kubeconfig') {
+      steps {
+        sh '''
+         $AWS eks update-kubeconfig --region $AWS_REGION --name eks-cicd-demo
+       '''
+   }
+ }
+
 
     stage('Deploy to EKS') {
       steps {
