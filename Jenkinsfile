@@ -7,6 +7,7 @@ pipeline {
     IMAGE_TAG = "${BUILD_NUMBER}"
     DOCKER = "/usr/local/bin/docker"
     AWS = "/opt/homebrew/bin/aws"
+    KUBECTL = "/usr/local/bin/kubectl"
     DOCKER_CONFIG = "/Users/rajatupadhyay/.jenkins/.docker"
    }
 
@@ -45,7 +46,7 @@ pipeline {
     stage('Deploy to EKS') {
       steps {
         sh '''
-          kubectl set image deployment/flask-app \
+            $KUBECTL set image deployment/flask-app \
             flask=$ECR_REPO_URL:$IMAGE_TAG
         '''
       }
