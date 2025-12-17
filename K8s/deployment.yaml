@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask
-        image: 200227355496.dkr.ecr.ap-south-1.amazonaws.com/flask-eks-demo:v1
+        image: 200227355496.dkr.ecr.ap-south-1.amazonaws.com/flask-eks-demo:IMAGE_TAG
         ports:
         - containerPort: 5000
         livenessProbe:

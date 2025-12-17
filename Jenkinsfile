@@ -5,10 +5,6 @@ pipeline {
     AWS_REGION = "ap-south-1"
     ECR_REPO_URL = "200227355496.dkr.ecr.ap-south-1.amazonaws.com/flask-eks-demo"
     IMAGE_TAG = "${BUILD_NUMBER}"
-    DOCKER = "/usr/local/bin/docker"
-    AWS = "/opt/homebrew/bin/aws"
-    KUBECTL = "/usr/local/bin/kubectl"
-    DOCKER_CONFIG = "/Users/rajatupadhyay/.jenkins/.docker"
    }
 
   stages {
@@ -22,7 +18,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         sh '''
-          $DOCKER build -t $ECR_REPO_URL:$IMAGE_TAG .
+          docker build -t $ECR_REPO_URL:$IMAGE_TAG .
         '''
       }
     }
@@ -30,35 +26,42 @@ pipeline {
     stage('Login to ECR') {
       steps {
         sh '''
-           $AWS ecr get-login-password --region $AWS_REGION \
-          | $DOCKER login --username AWS --password-stdin $ECR_REPO_URL
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin $ECR_REPO_URL
         '''
       }
     }
     stage('Push Image') {
       steps {
         sh '''
-          $DOCKER push $ECR_REPO_URL:$IMAGE_TAG
+          docker push $ECR_REPO_URL:$IMAGE_TAG
         '''
       }
     }
-    stage('Update kubeconfig') {
-      steps {
-        sh '''
-         $AWS eks update-kubeconfig --region $AWS_REGION --name eks-cicd-demo --kubeconfig /Users/rajatupadhyay/.jenkins/kubeconfig
-       '''
+    stage("Deploy to EKS"){
+      steps{
+        withCredentials([file(credentialsId: 'eks-kubeconfig', variable: 'KUBECONFIG')]) {
+            sh '''
+            export KUBECONFIG=$KUBECONFIG
+            kubectl set image deployment/flask-app flask=$ECR_REPO_URL:$IMAGE_TAG
+            kubectl rollout status deployment/flask-app --timeout=120s
+            '''
+          }
+        }
+     }
    }
- }
+  post {
+        failure {
+            echo "Deployment failed — rolling back"
+            withCredentials([file(credentialsId: 'eks-kubeconfig', variable: 'KUBECONFIG')]) {
+                sh '''
+                kubectl rollout undo deployment/flask-app
+                '''
+            }
+        }
 
-
-    stage('Deploy to EKS') {
-      steps {
-        sh '''
-            $KUBECTL --kubeconfig /Users/rajatupadhyay/.jenkins/kubeconfig set image deployment/flask-app \
-            flask=$ECR_REPO_URL:$IMAGE_TAG
-        '''
-      }
+        success {
+            echo "Deployment successful 🎉"
+        }
     }
-
-  }
 }
